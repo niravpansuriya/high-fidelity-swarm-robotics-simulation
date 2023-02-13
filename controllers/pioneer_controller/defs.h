@@ -19,3 +19,5 @@
 #define COORDINATE_MATCHING_ACCURACY 0.02 //in meter
 
 #define THETA_MATCHING_ACCURACY 1 //in degrees
+
+#define TOO_CLOSE_DISTANCE 0.2f

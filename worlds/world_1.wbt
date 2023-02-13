@@ -5,13 +5,14 @@ EXTERNPROTO "../protos/Pioneer3dx.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/solids/protos/SolidBox.proto"
 
 WorldInfo {
   coordinateSystem "NUE"
 }
 Viewpoint {
-  orientation -0.6953174536050508 0.6833193216493959 0.22272930515043995 2.63810338423033
-  position -6.6648211570704765 11.388981208070755 15.490907943934971
+  orientation -0.6713194260654303 0.6846686469459113 0.28382930094765807 2.651783336282176
+  position -2.1500167127809626 16.76297237169803 20.641599671119966
   followType "None"
 }
 TexturedBackground {
@@ -19,16 +20,26 @@ TexturedBackground {
 TexturedBackgroundLight {
 }
 Pioneer3dx {
-  hidden position_0_0 -12.580774376891176
-  hidden position_0_1 999.8296303152702
-  hidden position_0_2 988.0716550110278
-  hidden rotation_1 0 -1 0 0.01440376253200375
-  hidden position_1_0 -2089.0903226781197
-  hidden rotation_2 -0.9999999999999999 0 0 3.0728006944970088
-  hidden rotation_4 1 0 0 5.480018833463685
-  hidden rotation_9 1 0 0 4.671623523346849
-  translation -8.45577 0.0949249 8.0107
-  rotation 0.0005654360656283356 0.999893093968486 -0.014610986146868534 3.063965778823165
+  hidden position_0_0 -12.557473108030134
+  hidden position_0_1 1113.8697950200717
+  hidden position_0_2 1102.1128678256455
+  hidden linearVelocity_0 -1.2270716826586995e-09 1.0789707283154518e-09 4.691217243303708e-11
+  hidden angularVelocity_0 2.709653557494074e-10 -2.566035929943265e-11 7.871409540238591e-09
+  hidden rotation_1 0 1 0 0.008897506329037099
+  hidden position_1_0 -2371.271670267687
+  hidden linearVelocity_1 -4.6080017462390145e-10 7.69659758811397e-09 1.619352109438753e-11
+  hidden angularVelocity_1 2.924644009686965e-10 5.906746647277919e-10 7.936309708481693e-09
+  hidden rotation_2 1 0 0 3.7723758461965744
+  hidden linearVelocity_2 -2.994829225876591e-10 1.3602047845998014e-08 -9.324582337043396e-13
+  hidden angularVelocity_2 2.93887522164251e-10 5.906721113515005e-10 7.969065245336695e-09
+  hidden rotation_4 1 0 0 4.537189657894687
+  hidden linearVelocity_4 -7.74126663915714e-10 7.009611664606702e-09 3.264372919485134e-11
+  hidden angularVelocity_4 2.707270480750612e-10 -2.56577356721196e-11 7.872728644225529e-09
+  hidden rotation_9 1 0 0 3.7277462379617394
+  hidden linearVelocity_9 -7.585718597239204e-10 7.001156184068678e-09 3.203311555261721e-11
+  hidden angularVelocity_9 2.7062877093109815e-10 -2.5660461253770436e-11 7.869751079584156e-09
+  translation -8.456891872476112 0.09492486255168717 8.010700066024778
+  rotation 0.014097124967211832 0.9997939273766345 -0.014607321741641477 1.6068379745433954
   name "Pioneer 3-DX - 3"
   controller "pioneer_controller"
   supervisor TRUE
@@ -43,10 +54,14 @@ Pioneer3dx {
   ]
 }
 RectangleArena {
+  translation 0.988148 0 0.589325
   rotation -0.9999999999997401 5.0980765517166e-07 5.098076552328925e-07 1.5707963267951566
   floorSize 20 20
   floorAppearance Parquetry {
     type "light strip"
   }
   wallHeight 1
+}
+SolidBox {
+  translation -0.866642 1.1 2.06956
 }
