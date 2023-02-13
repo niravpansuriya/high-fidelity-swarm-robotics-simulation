@@ -1,0 +1,52 @@
+#VRML_SIM R2022b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "../protos/Pioneer3dx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+
+WorldInfo {
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.6953174536050508 0.6833193216493959 0.22272930515043995 2.63810338423033
+  position -6.6648211570704765 11.388981208070755 15.490907943934971
+  followType "None"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Pioneer3dx {
+  hidden position_0_0 -12.580774376891176
+  hidden position_0_1 999.8296303152702
+  hidden position_0_2 988.0716550110278
+  hidden rotation_1 0 -1 0 0.01440376253200375
+  hidden position_1_0 -2089.0903226781197
+  hidden rotation_2 -0.9999999999999999 0 0 3.0728006944970088
+  hidden rotation_4 1 0 0 5.480018833463685
+  hidden rotation_9 1 0 0 4.671623523346849
+  translation -8.45577 0.0949249 8.0107
+  rotation 0.0005654360656283356 0.999893093968486 -0.014610986146868534 3.063965778823165
+  name "Pioneer 3-DX - 3"
+  controller "pioneer_controller"
+  supervisor TRUE
+  extensionSlot [
+    GPS {
+    }
+    Compass {
+      rotation -0.5773489358550934 0.5773519358547601 0.5773499358549823 2.0944
+    }
+    Accelerometer {
+    }
+  ]
+}
+RectangleArena {
+  rotation -0.9999999999997401 5.0980765517166e-07 5.098076552328925e-07 1.5707963267951566
+  floorSize 20 20
+  floorAppearance Parquetry {
+    type "light strip"
+  }
+  wallHeight 1
+}
