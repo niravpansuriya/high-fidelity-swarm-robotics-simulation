@@ -27,7 +27,7 @@ public:
     /*
     To get robot coordinate by using gps.
     */
-    double *getRobotCoordinates();
+    vector<double> getRobotCoordinates();
     double getCompassReadingInDegrees();
 };
 

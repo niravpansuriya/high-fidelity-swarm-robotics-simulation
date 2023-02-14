@@ -7,7 +7,7 @@ using namespace std;
  * so to check if two coordinate are equal, we cannot check with formula: coordinate1==coordinate2
  * we must use a threshold accuracy
  * */
-bool cartesianIsCoordinateEqual(const double coordinate1[2], const double coordinate2[2]);
+bool cartesianIsCoordinateEqual(const vector<double> coordinate1, const vector<double> coordinate2);
 
 /*
  * in real world, there must be compass noise so the heading is not accurate
@@ -15,3 +15,6 @@ bool cartesianIsCoordinateEqual(const double coordinate1[2], const double coordi
  * we must use a threshold accuracy
  * */
 bool cartesianIsAngleEqual(double angle1, double angle2);
+
+double convertRadToDegree(double rad);
+double convertDegreeToRad(double degree);

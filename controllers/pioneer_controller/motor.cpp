@@ -41,7 +41,7 @@ void MotorController::motorRotateLeftInDegree(double degrees)
 {
     int timeStep = (int)robot->getBasicTimeStep();
 
-    this->motorRotateLeft(1.2);
+    this->motorRotateLeft(1);
     double initAngle = positionController->getCompassReadingInDegrees();
     if (initAngle < 0)
         initAngle += 360;
@@ -63,12 +63,39 @@ void MotorController::motorRotateLeftInDegree(double degrees)
     this->stopMotor();
 }
 
-void MotorController::moveToDestination(const double destinationCoordinate[2])
+void MotorController::motorRotateRightInDegree(double degrees)
+{
+    int timeStep = (int)robot->getBasicTimeStep();
+
+    this->motorRotateRight(1);
+    double initAngle = positionController->getCompassReadingInDegrees();
+    if (initAngle < 0)
+        initAngle += 360;
+
+    double desiredAngle = initAngle - degrees;
+    while(desiredAngle < 0) desiredAngle += 360;
+
+    double currentAngle = positionController->getCompassReadingInDegrees();
+    if (currentAngle < 0)
+        currentAngle += 360;
+
+    do
+    {
+        this->robot->step(timeStep);
+        currentAngle = positionController->getCompassReadingInDegrees();
+        if (currentAngle < 0)
+            currentAngle += 360;
+    } while (!cartesianIsAngleEqual(currentAngle, desiredAngle));
+
+    this->stopMotor();
+}
+
+void MotorController::moveToDestination(const vector<double> destinationCoordinate)
 {
     int timeStep = getRobotTimestep(robot);
     while (robot->step(timeStep) != -1)
     {
-        double *currLocation = positionController->getRobotCoordinates();
+        vector<double> currLocation = positionController->getRobotCoordinates();
 
         turnTowardDestination(destinationCoordinate);
 
@@ -81,11 +108,11 @@ void MotorController::moveToDestination(const double destinationCoordinate[2])
     }
 }
 
-void MotorController::turnTowardDestination(const double destinationCoordinate[2])
+void MotorController::turnTowardDestination(const vector<double> destinationCoordinate)
 {
     int timeStep = getRobotTimestep(robot);
 
-    double *currLocation = positionController->getRobotCoordinates();
+    vector<double> currLocation = positionController->getRobotCoordinates();
     double xDiff = destinationCoordinate[0] - currLocation[0];
     double yDiff = destinationCoordinate[1] - currLocation[1];
 

@@ -65,7 +65,7 @@
 ###
 ###-----------------------------------------------------------------------------
 
-CXX_SOURCES = sensors.cpp motor.cpp cartesian.cpp robotUtils.cpp positionController.cpp pioneer_controller.cpp
+CXX_SOURCES = sensors.cpp motor.cpp robotController.cpp cartesian.cpp robotUtils.cpp positionController.cpp pioneer_controller.cpp
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)

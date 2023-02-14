@@ -27,8 +27,9 @@ public:
     void motorRotateRight(int speed = 0);
     void motorRotateLeft(int speed = 0);
     void motorRotateLeftInDegree(double degrees);
-    void moveToDestination(const double destinationCoordinate[2]);
-    void turnTowardDestination(const double destinationCoordinate[2]);
+    void motorRotateRightInDegree(double degrees);
+    void moveToDestination(const vector<double> destinationCoordinate);
+    void turnTowardDestination(const vector<double> destinationCoordinate);
 };
 
 #endif

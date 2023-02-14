@@ -18,17 +18,21 @@ void SensorsController::initSensors()
 vector<bool> SensorsController::getSensorsCondition()
 {
     vector<bool> sensorsConditions;
+    // cout<<endl;
     for (int i = 0; i < NUMBER_OF_DISTANCE_SENSORS; i++)
     {
         double val = this->distanceSensors[i]->getValue();
-        if (val < TOO_CLOSE_DISTANCE)
+        // cout<<val<<" ";
+        if (val > 0 && val < TOO_CLOSE_DISTANCE)
             sensorsConditions.push_back(true);
         else
             sensorsConditions.push_back(false);
     }
+    // cout<<endl;
 
     return sensorsConditions;
 }
+
 
 bool SensorsController::isSomethingInFront()
 {

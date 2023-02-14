@@ -24,11 +24,9 @@ double PositionController::getCompassReadingInDegrees()
     return bearing;
 }
 
-double *PositionController::getRobotCoordinates()
+vector<double> PositionController::getRobotCoordinates()
 {
     const double *coordinates = this->gps->getValues();
-    static double *_2fValues = new double(2);
-    _2fValues[0] = coordinates[0];
-    _2fValues[1] = -1 * coordinates[2];
+    vector<double> _2fValues = {coordinates[0], -1 * coordinates[2]};
     return _2fValues;
 }

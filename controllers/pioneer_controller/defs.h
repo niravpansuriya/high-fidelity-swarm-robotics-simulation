@@ -1,5 +1,6 @@
 #include <limits>
 #include <cmath>
+#include <vector>
 
 #define INFINITE std::numeric_limits<double>::infinity()
 #define PI 3.14
@@ -21,3 +22,7 @@
 #define THETA_MATCHING_ACCURACY 1 //in degrees
 
 #define TOO_CLOSE_DISTANCE 0.2f
+
+#define MAX_BOT_TURN_RADIAN 0.25
+#define MAX_STEP_TIME 40
+#define ROBOT_SPEED 6
