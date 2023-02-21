@@ -20,3 +20,13 @@ double uniform(double min, double max)
 
   return dist(gen);
 }
+
+void removeVectorElements(vector<vector<double>>&v, llu sIndex, llu eIndex)
+{
+  auto it = v.begin() + sIndex;
+  while (sIndex < eIndex)
+  {
+    v.erase(it);
+    sIndex++;
+  }
+}

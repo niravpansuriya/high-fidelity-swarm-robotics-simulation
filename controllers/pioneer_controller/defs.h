@@ -1,9 +1,13 @@
 #include <limits>
 #include <cmath>
 #include <vector>
+#include <utility>
+#include "robotsUtils.h"
 
+#define llu long long
 #define INFINITE std::numeric_limits<double>::infinity()
 #define PI 3.14
+
 
 #define MAX_SPEED 6.28
 // #define ROBOT_ANGULAR_SPEED_IN_DEGREES 283.588111888
@@ -26,3 +30,8 @@
 #define MAX_BOT_TURN_RADIAN 0.25
 #define MAX_STEP_TIME 40
 #define ROBOT_SPEED 6
+
+#define PATH_SMOOTHING_RADIUS 5
+
+#define DESTINATION_X -18.2903
+#define DESTINATION_Y -7.7024

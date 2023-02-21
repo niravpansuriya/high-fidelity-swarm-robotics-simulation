@@ -12,4 +12,6 @@ int getRobotTimestep(Robot *robot);
 double fModulo(double n, double m);
 double uniform(double min, double max);
 
+void removeVectorElements(vector<vector<double>> &v, llu sIndex, llu eIndex);
+
 #endif

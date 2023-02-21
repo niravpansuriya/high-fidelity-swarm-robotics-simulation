@@ -4,6 +4,6 @@ build/release/motor.o: motor.cpp motor.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Device.hpp \
  C:/Program\ Files/Webots/include/controller/c/webots/types.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Compass.hpp \
- defs.h positionController.h \
+ defs.h robotsUtils.h positionController.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/gps.hpp \
- robotsUtils.h cartesian.h
+ cartesian.h

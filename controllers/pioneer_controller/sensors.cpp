@@ -22,6 +22,7 @@ vector<bool> SensorsController::getSensorsCondition()
     for (int i = 0; i < NUMBER_OF_DISTANCE_SENSORS; i++)
     {
         double val = this->distanceSensors[i]->getValue();
+        // if(i == 3)  cout<<"val "<<val;
         // cout<<val<<" ";
         if (val > 0 && val < TOO_CLOSE_DISTANCE)
             sensorsConditions.push_back(true);
@@ -31,6 +32,10 @@ vector<bool> SensorsController::getSensorsCondition()
     // cout<<endl;
 
     return sensorsConditions;
+}
+
+double SensorsController::getDistanceSensorReading(int i){
+    return distanceSensors[i]->getValue();
 }
 
 
