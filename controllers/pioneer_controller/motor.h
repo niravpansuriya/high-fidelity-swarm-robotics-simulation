@@ -28,8 +28,13 @@ public:
     void motorRotateLeft(int speed = 0);
     void motorRotateLeftInDegree(double degrees);
     void motorRotateRightInDegree(double degrees);
-    void moveToDestination(const vector<double> destinationCoordinate);
-    void turnTowardDestination(const vector<double> destinationCoordinate);
+    int getLeftMotorSpeed();
+    int getRightMotorSpeed();
+    vector<int> getCurrentState();
+    void setCurrentSet(vector<int> &state);
+    void setSpeed(double left, double right, double a = 1);
+    Motor* getLeftMotorReference();
+    Motor* getRightMotorReference();
 };
 
 #endif

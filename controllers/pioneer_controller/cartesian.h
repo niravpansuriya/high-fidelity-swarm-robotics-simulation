@@ -1,3 +1,6 @@
+#ifndef C_HEADER
+#define C_HEADER
+
 #include "defs.h"
 
 using namespace std;
@@ -19,6 +22,7 @@ bool cartesianIsAngleEqual(double angle1, double angle2);
 double convertRadToDegree(double rad);
 double convertDegreeToRad(double degree);
 double getDistance(vector<double> p1, vector<double> p2);
+double getPathLength(vector<vector<double>> &path);
 
 vector<vector<double>> getPerimeterCoords(double x, double y, double rad);
 
@@ -26,3 +30,5 @@ vector<pair<vector<double>, llu>> getPerimeterCoordsWithPathCoords(vector<vector
                                                                    vector<vector<double>> &perimeterCoords,
                                                                    llu currentPathIndex,
                                                                    bool forward = true);
+
+#endif

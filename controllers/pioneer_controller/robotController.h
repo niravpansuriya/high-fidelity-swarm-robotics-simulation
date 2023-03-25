@@ -9,9 +9,10 @@
 #include "motor.h"
 #include "positionController.h"
 #include "sensors.h"
+#include "communication.h"
+#include "TrackerApp.h"
 using namespace webots;
 using namespace std;
-
 
 class RobotController
 {
@@ -20,24 +21,35 @@ private:
     MotorController *motorController;
     PositionController *positionController;
     SensorsController *sensorController;
-
+    Communication *communication;
+    string robotId;
     string mode; // explore or transport
 
     vector<vector<double>> path;
     llu currentPathIndex;
 
+    TrackerApp *trackerApp;
+
 public:
-    RobotController(Robot *robot);
+    RobotController(Robot *robot, string robotId);
     void moveToRandomLocation();
     void addLocationToVisitedPath(vector<double> location);
     void followPath(bool forward = true);
     llu getNearestPointIndexForPathSmoothing(bool forward = true);
-
+    string getRobotId();
     bool isDestinationReachable(const vector<double> dest);
     bool gotoDestination();
     string getMode();
-    void replacePath(vector<vector<double>> path);
-    // void broadcastPath();
+    void updateMode(string mode);
+    void updatePath(vector<vector<double>> &receivedPath);
+    string *getRobotModeReference();
+    int getNearestPathIndex(vector<vector<double>> &path);
+    vector<vector<double>> &getPath();
+    void moveToDestination(const vector<double> destinationCoordinate);
+    void turnTowardDestination(const vector<double> destinationCoordinate);
+    int middleware();
+    void exploreEnvironment();
+    void displayEstimate();
 };
 
 #endif

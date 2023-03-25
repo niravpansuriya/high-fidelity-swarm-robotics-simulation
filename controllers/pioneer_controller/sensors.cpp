@@ -21,9 +21,9 @@ vector<bool> SensorsController::getSensorsCondition()
     // cout<<endl;
     for (int i = 0; i < NUMBER_OF_DISTANCE_SENSORS; i++)
     {
-        double val = this->distanceSensors[i]->getValue();
-        // if(i == 3)  cout<<"val "<<val;
-        // cout<<val<<" ";
+        double val = getDistanceSensorReading(i);
+            // cout << i << " " << val << endl;
+
         if (val > 0 && val < TOO_CLOSE_DISTANCE)
             sensorsConditions.push_back(true);
         else
@@ -34,10 +34,11 @@ vector<bool> SensorsController::getSensorsCondition()
     return sensorsConditions;
 }
 
-double SensorsController::getDistanceSensorReading(int i){
-    return distanceSensors[i]->getValue();
+double SensorsController::getDistanceSensorReading(int i)
+{
+    double val = distanceSensors[i]->getValue();
+    return val < 0 ? 99 : val;
 }
-
 
 bool SensorsController::isSomethingInFront()
 {
@@ -48,11 +49,42 @@ bool SensorsController::isSomethingInFront()
 bool SensorsController::isSomethingInFrontLeft()
 {
     vector<bool> distanceSensorsCondition = getSensorsCondition();
-    return distanceSensorsCondition[1] || distanceSensorsCondition[3];
+    return distanceSensorsCondition[1] || distanceSensorsCondition[3] || distanceSensorsCondition[2];
 }
 
 bool SensorsController::isSomethingInFrontRight()
 {
     vector<bool> distanceSensorsCondition = getSensorsCondition();
-    return distanceSensorsCondition[4] || distanceSensorsCondition[6];
+    return distanceSensorsCondition[4] || distanceSensorsCondition[6] || distanceSensorsCondition[5];
+}
+
+double SensorsController::getDistanceAtFrontRight()
+{
+    double distance = min(distanceSensors[4]->getValue(), min(distanceSensors[5]->getValue(), distanceSensors[6]->getValue()));
+    return distance < 0 ? 99 : distance;
+}
+
+double SensorsController::getDistanceAtFrontLeft()
+{
+    double distance = min(distanceSensors[1]->getValue(), min(distanceSensors[2]->getValue(), distanceSensors[3]->getValue()));
+    return distance < 0 ? 99 : distance;
+}
+
+double SensorsController::getDistanceAtFront()
+{
+    double distance = min(distanceSensors[3]->getValue(), distanceSensors[4]->getValue());
+    ;
+    return distance < 0 ? 99 : distance;
+}
+
+bool SensorsController::isSomethingInLeft()
+{
+    vector<bool> distanceSensorsCondition = getSensorsCondition();
+    return distanceSensorsCondition[0];
+}
+
+bool SensorsController::isSomethingInRight()
+{
+    vector<bool> distanceSensorsCondition = getSensorsCondition();
+    return distanceSensorsCondition[7];
 }

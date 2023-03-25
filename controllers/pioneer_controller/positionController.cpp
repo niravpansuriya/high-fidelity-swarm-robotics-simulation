@@ -30,3 +30,8 @@ vector<double> PositionController::getRobotCoordinates()
     vector<double> _2fValues = {coordinates[0], -1 * coordinates[2]};
     return _2fValues;
 }
+
+Compass* PositionController::getCompassRef()
+{
+    return compass;
+}

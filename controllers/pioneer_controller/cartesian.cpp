@@ -25,8 +25,21 @@ bool cartesianIsAngleEqual(double angle1, double angle2)
     }
 }
 
-double getDistance(vector<double> p1, vector<double> p2){
-    return sqrt(pow(p2[0]-p1[0],2) + pow(p2[1]-p1[1],2));
+double getDistance(vector<double> p1, vector<double> p2)
+{
+    return sqrt(pow(p2[0] - p1[0], 2) + pow(p2[1] - p1[1], 2));
+}
+
+double getPathLength(vector<vector<double>> &path)
+{
+    double distance = 0;
+
+    for (int i = 1; i < path.size(); i++)
+    {
+        distance += getDistance(path[i - 1], path[i]);
+    }
+
+    return distance;
 }
 
 double convertRadToDegree(double rad)

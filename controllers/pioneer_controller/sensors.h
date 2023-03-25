@@ -27,7 +27,12 @@ public:
     bool isSomethingInFront();
     bool isSomethingInFrontLeft();
     bool isSomethingInFrontRight();
+    bool isSomethingInLeft();
+    bool isSomethingInRight();
     double getDistanceSensorReading(int i);
+    double getDistanceAtFrontLeft();
+    double getDistanceAtFrontRight();
+    double getDistanceAtFront();
 };
 
 #endif

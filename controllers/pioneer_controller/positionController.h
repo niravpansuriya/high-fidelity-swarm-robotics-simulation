@@ -29,6 +29,7 @@ public:
     */
     vector<double> getRobotCoordinates();
     double getCompassReadingInDegrees();
+    Compass* getCompassRef();
 };
 
 #endif
