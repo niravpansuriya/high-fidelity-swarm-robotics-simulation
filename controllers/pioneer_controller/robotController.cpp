@@ -675,7 +675,7 @@ int RobotController::middleware()
         motorController->setSpeed(0, 0, 20);
 
         // cout << robot->getName() << " motor stopped" << endl;
-        if (communication->establishConnection())
+        if (communication->establishConnectionV3())
         {
             cout << robot->getName() << " connection establish successful " << endl;
 
@@ -686,7 +686,7 @@ int RobotController::middleware()
             vector<vector<double>> receivedPath;
             if (communication->receivePath(receivedPath))
             {
-                cout << "partner path outt" << receivedPath.size() << " " << receivedPath[receivedPath.size() - 1][0] << " " << receivedPath[receivedPath.size() - 1][1] << endl;
+                // cout << "partner path outt" << receivedPath.size() << " " << receivedPath[receivedPath.size() - 1][0] << " " << receivedPath[receivedPath.size() - 1][1] << endl;
 
                 // cout << "20000" << endl;
                 updatePath(receivedPath);

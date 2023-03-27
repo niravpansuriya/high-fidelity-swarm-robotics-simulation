@@ -25,7 +25,6 @@ int main(int argc, char **argv)
   // create the Robot instance.
   Robot *robot = new Robot();
 
-
   string robotId = getRobotId((robot->getName()));
   RobotController *robotController = new RobotController(robot, robotId);
 
@@ -162,37 +161,41 @@ int main(int argc, char **argv)
   // motorController->setSpeed(10, 10, 20);
 
   int temp = 0;
+  // robotController->updateMode("transport");
+
   while (robot->step(timeStep) != -1)
   {
-    // if(robot->getName() == "robot_3"){
-    //   robotController->moveToDestination({-48.1516,5.92378});
-
-    // }
+    // {
+    //   if (robot->getName() == "robot_1" || robot->getName() == "robot_2" || robot->getName() == "robot_3" || robot->getName() == "robot_4")
+    //   {
+    //     motorController->setSpeed(5,5);
+    //     // robotController->moveToDestination({-48.1516,5.92378});
+    //     robotController->middleware();
+    //   }
     // else if(robot->getName() == "robot_2"){
     //   robotController->moveToDestination({-45.952,2.7318});
     // }
     // if (robot->getName() == "robot_3" || robot->getName() == "robot_2")
     // {
-      if (robotController->getMode() == "explore")
+    if (robotController->getMode() == "explore")
+    {
+      robotController->exploreEnvironment();
+      robotController->updateMode("transport");
+      f = false;
+    }
+    else
+    {
+      if (temp % 2 == 0)
       {
-        robotController->exploreEnvironment();
-        robotController->updateMode("transport");
-        f = false;
+        robotController->followPath(false);
       }
       else
       {
-        if (temp % 2 == 0)
-        {
-          robotController->followPath(false);
-        }
-        else
-        {
-          robotController->followPath(true);
-        }
-        temp++;
+        robotController->followPath(true);
       }
+      temp++;
+    }
     // }
-    // // robotController->middleware();
     // if (f)
     // {
     //   cout<<"here"<<endl;

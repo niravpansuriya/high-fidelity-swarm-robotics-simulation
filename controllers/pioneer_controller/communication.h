@@ -50,6 +50,8 @@ public:
     string getNextMessage();
     void broadcastWaitMessage();
     bool establishConnection();
+    bool establishConnectionV2();
+    bool establishConnectionV3();
     int getCommunicationChannel(const string &robotId, const string &partnerId);
     bool receivePath(vector<vector<double>> &partnerPath);
     void sendAcceptMessage();
@@ -58,6 +60,8 @@ public:
     string getReceiverId(const string &message);
     int getQueueLength();
     void clearQueue();
+    bool isMessageForMe(const string &message);
+    // bool exchangePath(vector<vector<double>> &path, vector<vector<double>> &partnerPath);
 
 };
 
