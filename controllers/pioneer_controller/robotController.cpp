@@ -342,7 +342,6 @@ void RobotController::followPath(bool forward)
         // for (llu i = currentPathIndex; i < path.size(); i++)
         while (currentPathIndex != path.size())
         {
-
             // currentPathIndex = i;
             int i = currentPathIndex;
             // cout << robot->getName() << " " << currentPathIndex << " " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
