@@ -61,6 +61,8 @@ int main(int argc, char **argv)
   // motorController->motorMoveForward(6);
   int count = 0;
 
+  // Display *display = robot->getDisplay("display");
+
   // Camera *camera = robot->getCamera("camera");
   // int width = camera->getWidth();
   // int height = camera->getHeight();
@@ -162,9 +164,19 @@ int main(int argc, char **argv)
 
   int temp = 0;
   // robotController->updateMode("transport");
-
+  // if (robot->getName() == "robot_1")
+  // {
+  //   robotController->updateMode("transport");
+  //   vector<vector<double>> p = {
+  //     {1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{1,2},{4,5}
+  //   };
+  //   robotController->updatePath(p);
+  //   motorController->setSpeed(4,4);
+  // }
   while (robot->step(timeStep) != -1)
   {
+    // robotController->middleware();
+
     // {
     //   if (robot->getName() == "robot_1" || robot->getName() == "robot_2" || robot->getName() == "robot_3" || robot->getName() == "robot_4")
     //   {
@@ -177,24 +189,32 @@ int main(int argc, char **argv)
     // }
     // if (robot->getName() == "robot_3" || robot->getName() == "robot_2")
     // {
-    if (robotController->getMode() == "explore")
-    {
-      robotController->exploreEnvironment();
-      robotController->updateMode("transport");
-      f = false;
-    }
-    else
-    {
-      if (temp % 2 == 0)
+    // if (robot->getName() == "robot_1")
+    // {
+
+      if (robotController->getMode() == "explore")
       {
-        robotController->followPath(false);
+        // display->setColor(0xFF0000);
+        robotController->exploreEnvironment();
+        robotController->updateMode("transport");
+        f = false;
       }
       else
       {
-        robotController->followPath(true);
+        // display->setColor(0x00FF00);
+
+        if (temp % 2 == 0)
+        {
+          robotController->followPath(false);
+        }
+        else
+        {
+          robotController->followPath(true);
+        }
+        temp++;
       }
-      temp++;
-    }
+    // }
+
     // }
     // if (f)
     // {

@@ -10,7 +10,9 @@ RobotController::RobotController(Robot *robot, string robotId)
     this->communication = new Communication(robot, robot->getName() + "_emitter", robot->getName() + "_receiver", getRobotId(), getRobotModeReference());
     this->currentPathIndex = -1;
     sensorController->initSensors();
+    // display = robot->getDisplay("display");
     mode = "explore";
+    // pathSmoothingRadius = MIN_PATH_SMOOTHING_RADIUS;
 
     // trackerApp = new TrackerApp(robot->getDisplay("display"));
 }
@@ -42,7 +44,7 @@ void RobotController::exploreEnvironment()
     int oppoCount = 0;
     vector<double> lastCords;
     double lastCheck = -1;
-
+    vector<double> lastCoorTurned;
     while (robot->step(timeStep) != -1)
     {
         // if (c >= l)
@@ -60,10 +62,15 @@ void RobotController::exploreEnvironment()
         // }
 
         middleware();
-
+        // cout<<robot->getName()<<" inspection not return"<<endl;
         if (mode == "transport")
             return;
         vector<double> currLocation = positionController->getRobotCoordinates();
+
+        // cout<<"x: "<<(int)((-1*currLocation[0]+6.67)*3.5)<<endl;
+        // cout<<"y: "<<(int)((-1*currLocation[1]-26)*2.7)<<endl;
+
+        // display->drawPixel((int)((-1 * currLocation[1] + 6.67) * 3.5), (int)((-1 * currLocation[0] - 26) * 2.7));
 
         if (!lastCords.size())
         {
@@ -118,9 +125,10 @@ void RobotController::exploreEnvironment()
 
         if (path.size() == 0)
             addLocationToVisitedPath(currLocation);
-        else if (getDistance(path[path.size() - 1], currLocation) >= PATH_RADIUS_THRESHOLD)
+        else if (lastCoorTurned.size() == 0 || getDistance(lastCoorTurned, currLocation) >= DISTANCE_NEW_DIRECTION)
         {
-            count = uniform(-18, 18);
+            lastCoorTurned = currLocation;
+            count = uniform(-16, 16);
             if (count < 0)
             {
                 leftF = 0.8;
@@ -131,7 +139,10 @@ void RobotController::exploreEnvironment()
                 leftF = 1;
                 rightF = 0.8;
             }
-            // c++;
+        }
+        else if (getDistance(path[path.size() - 1], currLocation) >= DISTANCE_COOR_STORING)
+        {
+
             addLocationToVisitedPath(currLocation);
         }
 
@@ -218,10 +229,11 @@ void RobotController::exploreEnvironment()
         {
             if (gotoDestination())
             {
-                cout << "reached " << robot->getName() << " " << path.size() << endl;
                 motorController->setSpeed(0, 0, 1);
                 currLocation = positionController->getRobotCoordinates();
                 addLocationToVisitedPath(currLocation);
+                cout << "reached " << robot->getName() << " " << path.size() << " " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
+
                 return;
             }
             else
@@ -321,7 +333,7 @@ void RobotController::followPath(bool forward)
         return;
 
     currentPathIndex = getNearestPathIndex(path);
-
+    // pathSmoothingRadius += 1;
     if (forward)
     {
         cout << "follow forward" << endl;
@@ -330,6 +342,7 @@ void RobotController::followPath(bool forward)
         // for (llu i = currentPathIndex; i < path.size(); i++)
         while (currentPathIndex != path.size())
         {
+
             // currentPathIndex = i;
             int i = currentPathIndex;
             // cout << robot->getName() << " " << currentPathIndex << " " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
@@ -338,10 +351,21 @@ void RobotController::followPath(bool forward)
             vector<double> destination = {path[i][0], path[i][1]};
             moveToDestination(destination);
 
+            cout << robot->getName() << " getNearestPointIndexForPathSmoothing before" << endl;
             llu nearestIndex = getNearestPointIndexForPathSmoothing(forward);
+            cout << robot->getName() << " getNearestPointIndexForPathSmoothing after" << endl;
+
+            cout << robot->getName() << " getNearestPointIndexForPathSmoothing after" << endl;
+            cout<< robot->getName()<< " nearestIndex: "<<nearestIndex<<endl;
+            cout<< robot->getName()<< " path size : "<<path.size()<< " "<< currentPathIndex << endl;
+
             if ((nearestIndex != path.size() - 1 && nearestIndex != __LONG_LONG_MAX__) && nearestIndex - currentPathIndex >= 2)
             {
+                cout << robot->getName() << " removeVectorElements before" << endl;
+
                 removeVectorElements(path, currentPathIndex + 1, nearestIndex);
+                cout << robot->getName() << " removeVectorElements after" << endl;
+
                 // cout << robot->getName() << " "
                 //      << "Curr Size: " << path.size() << endl;
                 // cout << robot->getName() << " " << path[0][0] << " " << path[0][1] << endl;
@@ -365,10 +389,24 @@ void RobotController::followPath(bool forward)
 
             // vector<double> destination = {path[i][0], path[i][1]};
             moveToDestination(path[i]);
+
+            cout << robot->getName() << " getNearestPointIndexForPathSmoothing before" << endl;
+
             llu nearestIndex = getNearestPointIndexForPathSmoothing(forward);
+
+            cout << robot->getName() << " getNearestPointIndexForPathSmoothing after" << endl;
+            cout<< robot->getName()<< " nearestIndex: "<<nearestIndex<<endl;
+            cout<< robot->getName()<< " path size : "<<path.size()<< " "<< currentPathIndex << endl;
+
+
             if ((nearestIndex != 0 && nearestIndex != __LONG_LONG_MAX__) && currentPathIndex - nearestIndex >= 2)
             {
+                cout << robot->getName() << " removeVectorElements before" << endl;
+
                 removeVectorElements(path, nearestIndex + 1, currentPathIndex);
+
+                cout << robot->getName() << " removeVectorElements after" << endl;
+
                 // cout << robot->getName() << " "
                 //      << "Curr Size: " << path.size() << endl;
                 // cout << robot->getName() << " " << path[0][0] << " " << path[0][1] << endl;
@@ -463,17 +501,23 @@ void RobotController::updatePath(vector<vector<double>> &receivedPath)
     if (mode == "explore")
     {
         path = receivedPath;
-        currentPathIndex = getNearestPathIndex(path);
-        cout << "receivedPath path 1" << receivedPath.size() << " " << receivedPath[receivedPath.size() - 1][0] << " " << receivedPath[receivedPath.size() - 1][1] << endl;
-        cout << "path path 1" << path.size() << " " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
-        cout << "currentPathIndex path 1" << currentPathIndex << endl;
+        cout << robot->getName() << " receiver path, was in explore mode with length before " << getPathLength(path) <<" "<<path.size()<<" "<<currentPathIndex <<endl;
 
+        currentPathIndex = getNearestPathIndex(path);
+        // cout << "receivedPath path 1" << receivedPath.size() << " " << receivedPath[receivedPath.size() - 1][0] << " " << receivedPath[receivedPath.size() - 1][1] << endl;
+        // cout << "path path 1" << path.size() << " " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
+        // cout << "currentPathIndex path 1" << currentPathIndex << endl;
+        cout << robot->getName() << " receiver path, was in explore mode with length after " << getPathLength(path) <<" "<<path.size()<<" "<<currentPathIndex <<endl;
         updateMode("transport");
     }
     else
     {
+        cout << robot->getName() << " path last before " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
+        cout << robot->getName() << " path last before " << " "<<path.size()<<" "<<currentPathIndex << endl;
+
+        double beforePathLength = getPathLength(path);
         int receivedPathNearestIndex = getNearestPathIndex(receivedPath);
-        int currentPathIndex = getNearestPathIndex(path);
+        currentPathIndex = getNearestPathIndex(path);
 
         // calculate the distance of first half and second half
         vector<vector<double>> v(path.begin(), path.begin() + currentPathIndex + 1);
@@ -508,7 +552,13 @@ void RobotController::updatePath(vector<vector<double>> &receivedPath)
         path = updatedPath;
 
         // update index
-        currentPathIndex = getNearestPathIndex(updatedPath);
+        currentPathIndex = getNearestPathIndex(path);
+
+        double afterPathLength = getPathLength(path);
+        cout << robot->getName() << " path before " << beforePathLength << " and path after " << afterPathLength << endl;
+        cout << robot->getName() << " path last after " << path[path.size() - 1][0] << " " << path[path.size() - 1][1] << endl;
+        cout << robot->getName() << " path last after " << " "<<path.size()<<" "<<currentPathIndex << endl;
+
     }
 }
 
@@ -677,7 +727,7 @@ int RobotController::middleware()
         // cout << robot->getName() << " motor stopped" << endl;
         if (communication->establishConnectionV3())
         {
-            cout << robot->getName() << " connection establish successful " << endl;
+            // cout << robot->getName() << " connection establish successful " << endl;
 
             if (mode != "explore")
                 communication->broadcastPath(path);
@@ -686,6 +736,12 @@ int RobotController::middleware()
             vector<vector<double>> receivedPath;
             if (communication->receivePath(receivedPath))
             {
+                cout << robot->getName() << " ==================================================================== path received: ";
+                for (vector<double> path : receivedPath)
+                {
+                    cout << path[0] << " " << path[1] << " ";
+                }
+                cout << "=================================================================" << endl;
                 // cout << "partner path outt" << receivedPath.size() << " " << receivedPath[receivedPath.size() - 1][0] << " " << receivedPath[receivedPath.size() - 1][1] << endl;
 
                 // cout << "20000" << endl;
@@ -701,6 +757,7 @@ int RobotController::middleware()
 
         motorController->setCurrentSet(currMotorState);
     }
+    // cout << robot->getName() << " status " << status << endl;
     return status;
 }
 
@@ -763,14 +820,14 @@ void RobotController::moveToDestination(const vector<double> destinationCoordina
         // cout << robot->getName() << " " << sensorController->getDistanceSensorReading(3) << " " << sensorController->getDistanceSensorReading(4) << " " << communication->getQueueLength() << endl;
         if ((sensorController->getDistanceSensorReading(3) < 1 || sensorController->getDistanceSensorReading(4) < 1) && communication->getQueueLength())
         {
-            cout << "there is a robot near" << endl;
+            // cout << "there is a robot near" << endl;
 
             motorController->setSpeed(-2, -2);
             // // wait for 5 seconds
             double currTime = robot->getTime();
             while (robot->step(timeStep) != -1)
             {
-                if (robot->getTime() - currTime >= 4)
+                if (robot->getTime() - currTime >= 2)
                 {
                     break;
                 }
@@ -779,19 +836,31 @@ void RobotController::moveToDestination(const vector<double> destinationCoordina
             motorController->setSpeed(2, -2);
             while (robot->step(timeStep) != -1)
             {
+                if (robot->getTime() - currTime >= 1)
+                {
+                    break;
+                }
+            }
+            motorController->motorMoveForward(5);
+            while (robot->step(timeStep) != -1)
+            {
                 if (robot->getTime() - currTime >= 2)
                 {
                     break;
                 }
             }
-            motorController->motorMoveForward(10);
+            // count=0;
             continue;
         }
 
         if (middleware())
+        {
+            // cout << robot->getName() << " inspection " << endl;
             return;
+        }
 
         vector<double> currLocation = positionController->getRobotCoordinates();
+        // display->drawPixel((int)((-1 * currLocation[1] + 6.67) * 3.5), (int)((-1 * currLocation[0] - 26) * 2.7));
 
         if ((count++ % 10) == 0)
         {
@@ -818,19 +887,19 @@ void RobotController::moveToDestination(const vector<double> destinationCoordina
     }
 }
 
-void RobotController::displayEstimate()
-{
-    // Display the actual position
-    vector<double> values = positionController->getRobotCoordinates();
-    // vector<double> values = {0,0};
-    // values[0] = uniform(0,200);
-    // values[1] = uniform(0,200);
+// void RobotController::displayEstimate()
+// {
+//     // Display the actual position
+//     vector<double> values = positionController->getRobotCoordinates();
+//     // vector<double> values = {0,0};
+//     // values[0] = uniform(0,200);
+//     // values[1] = uniform(0,200);
 
-    cout << "=== " << values[0] << " " << values[1] << endl;
-    trackerApp->addActualLocation((int)((values[0] + 48) * 2.5), (int)((values[1] + 20) * 2.5)); // Need to negate the Y value
+//     cout << "=== " << values[0] << " " << values[1] << endl;
+//     trackerApp->addActualLocation((int)((values[0] + 48) * 2.5), (int)((values[1] + 20) * 2.5)); // Need to negate the Y value
 
-    // System.out.printf("Actual(x, y) = (%2.1f, %2.1f)\n", (values[0]), -(values[2]));
-    //  Display the estimated position
-    //  trackerApp->addEstimatedLocation((int)(values[0]), (int)(values[1]));
-    //  cout<<"3"<<endl;
-}
+//     // System.out.printf("Actual(x, y) = (%2.1f, %2.1f)\n", (values[0]), -(values[2]));
+//     //  Display the estimated position
+//     //  trackerApp->addEstimatedLocation((int)(values[0]), (int)(values[1]));
+//     //  cout<<"3"<<endl;
+// }

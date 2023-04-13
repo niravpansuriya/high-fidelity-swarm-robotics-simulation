@@ -25,8 +25,11 @@ private:
     string robotId;
     string mode; // explore or transport
 
+    // Display *display;
+
     vector<vector<double>> path;
     llu currentPathIndex;
+    int pathSmoothingRadius;
 
     TrackerApp *trackerApp;
 
@@ -49,7 +52,7 @@ public:
     void turnTowardDestination(const vector<double> destinationCoordinate);
     int middleware();
     void exploreEnvironment();
-    void displayEstimate();
+    // void displayEstimate();
 };
 
 #endif

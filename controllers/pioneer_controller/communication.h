@@ -32,7 +32,8 @@ private:
 public:
     Communication(Robot *robot, const string emitterName, const string receiverName, string robotId, string *robotMode);
 
-    string createPackage(vector<vector<double>> &path);
+    // string createPackage(vector<vector<double>> &path);
+    vector<string> createPackage(vector<vector<double>> &path);
     static vector<vector<double>> getDataFromPackage(double *v, int size);
     void enableReceiver();
     void disableReceiver();

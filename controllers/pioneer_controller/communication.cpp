@@ -48,12 +48,36 @@ string Communication::getPartnerMode(const string &message)
     return splittedString[2];
 }
 
-string Communication::createPackage(vector<vector<double>> &path)
+// string Communication::createPackage(vector<vector<double>> &path)
+// {
+//     string package = "PATH_1_";
+
+//     for (int i = 0; i < path.size(); i++)
+//     {
+//         vector<double> coor = path[i];
+//         package += to_string(coor[0]) + ",";
+//         package += to_string(coor[1]);
+//         if (i != path.size() - 1)
+//             package += ',';
+//     }
+
+//     return package;
+// }
+
+vector<string> Communication::createPackage(vector<vector<double>> &path)
 {
+    int SIZE = 20;
+    vector<string> chunks;
+
     string package = "PATH_1_";
 
     for (int i = 0; i < path.size(); i++)
     {
+        if (i != 0 && i % SIZE == 0)
+        {
+            chunks.push_back(package);
+            package = "PATH_" + to_string(i / SIZE + 1) + "_";
+        }
         vector<double> coor = path[i];
         package += to_string(coor[0]) + ",";
         package += to_string(coor[1]);
@@ -61,12 +85,15 @@ string Communication::createPackage(vector<vector<double>> &path)
             package += ',';
     }
 
-    return package;
+    chunks.push_back(package);
+
+    return chunks;
 }
 
 vector<vector<double>> Communication::getPathFromString(const string &path)
 {
-    const string pathString = split(path, '_')[2];
+    // const string pathString = split(path, '_')[2];
+    const string pathString = path;
     vector<string> pathArray = split(pathString, ',');
 
     vector<vector<double>> res;
@@ -118,6 +145,26 @@ void Communication::disableReceiver()
     }
 }
 
+// void Communication::broadcastPath(vector<vector<double>> &path)
+// {
+//     // if robot's mode is explore, then do not broadcast the path
+//     if (*robotMode == "explore")
+//     {
+//         return;
+//     }
+
+//     cout << robot->getName() << " broadcasting path" << endl;
+//     // generate package based on path
+//     string pathPackage = createPackage(path);
+//     // string pathPackage = "PATH_1_Message Message Message";
+//     cout << robot->getName() << " broadcasting path done" << endl;
+
+//     sendMessage(pathPackage);
+
+//     sendMessage("END_" + robotId);
+//     // cout << robot->getName() << " Path sending done" << endl;
+// }
+
 void Communication::broadcastPath(vector<vector<double>> &path)
 {
     // if robot's mode is explore, then do not broadcast the path
@@ -126,15 +173,20 @@ void Communication::broadcastPath(vector<vector<double>> &path)
         return;
     }
 
-    cout << robot->getName() << " broadcasting path" << endl;
+    cout << robot->getName() << " broadcasting path " <<path[path.size()-1][0]<<" "<<path[path.size()-1][1]<< endl;
     // generate package based on path
-    string pathPackage = createPackage(path);
+    vector<string> pathPackage = createPackage(path);
     // string pathPackage = "PATH_1_Message Message Message";
-    cout << robot->getName() << " broadcasting path done" << endl;
 
-    sendMessage(pathPackage);
+    for (string chunk : pathPackage)
+    {
+        sendMessage(chunk);
+    }
 
     sendMessage("END_" + robotId);
+
+    cout << robot->getName() << " broadcasting path done" << endl;
+
     // cout << robot->getName() << " Path sending done" << endl;
 }
 
@@ -253,35 +305,61 @@ bool Communication::receivePath(vector<vector<double>> &partnerPath)
         priority[partnerId] = robot->getTime();
         handleReject();
 
-        cout << "out 1" << endl;
         return false;
     }
 
     // cout << robot->getName() << " looking for path" << endl;
     double startTime = robot->getTime();
     int timestep = getRobotTimestep(robot);
+    int count = 0;
+    unordered_map<int, string> m;
+
     while (robot->step(timestep) != -1)
     {
+        cout << "innn" << endl;
         if (!receiver->getQueueLength())
         {
-            if (robot->getTime() - startTime >= ESTIMATED_COMM_TIME)
-            {
-                handleReject();
-                return false;
-            }
+
+            cout << "innn 1" << endl;
+
             continue;
+        }
+
+        if (robot->getTime() - startTime >= ESTIMATED_COMM_TIME)
+        {
+            cout << "innn 2" << endl;
+
+            handleReject();
+            return false;
         }
         // get data
         string data = getNextMessage();
         cout << robot->getName() << " received data: " << data << endl;
+
         if (getMessageType(data) == "PATH")
         {
-            cout << robot->getName() << "======================================================================================================= " << data << endl;
-            partnerPath = getPathFromString(data);
+            vector<string> splitted = split(data, '_');
+
+            // get id
+            int id = stoi(splitted[1]);
+            m[id] = splitted[2];
+            count++;
+            // cout << "here" << endl;
+            // cout << robot->getName() << "======================================================================================================= " << data << endl;
             // cout << "partner path innnn" << partnerPath.size() << " " << partnerPath[partnerPath.size() - 1][0] << " " << partnerPath[partnerPath.size() - 1][1] << endl;
         }
         else if (getMessageType(data) == "END")
         {
+            // cout << "innn 3 " <<count<< endl;
+
+            string pathString = "";
+            for (int i = 1; i <= count; i++)
+            {
+                pathString += m[i];
+            }
+            // cout<<"pathString "<<pathString<<endl;
+            partnerPath = getPathFromString(pathString);
+
             priority[partnerId] = robot->getTime();
             handleReject();
 
@@ -364,8 +442,8 @@ bool Communication::establishConnection()
     // clear queue
     clearQueue();
 
-    cout << robot->getName() << " establishing connection" << endl;
-    cout << robot->getName() << " partnerId " << partnerId << endl;
+    // cout << robot->getName() << " establishing connection" << endl;
+    // cout << robot->getName() << " partnerId " << partnerId << endl;
 
     commStartTime = robot->getTime();
     isCommunicating = true;
@@ -394,7 +472,7 @@ bool Communication::establishConnection()
             {
                 lastAckTime = robot->getTime();
                 sendMessage("ACK_" + robotId);
-                cout << robot->getName() << " sent ack message" << endl;
+                // cout << robot->getName() << " sent ack message" << endl;
             }
         }
         else
@@ -403,7 +481,7 @@ bool Communication::establishConnection()
             {
                 lastAcceptMessageSendTime = robot->getTime();
                 sendMessage("ACCEPT_" + robotId);
-                cout << robot->getName() << " sent accept message" << endl;
+                // cout << robot->getName() << " sent accept message" << endl;
             }
             broadcastWaitMessage();
         }
@@ -412,7 +490,7 @@ bool Communication::establishConnection()
             continue;
 
         const string data = getNextMessage();
-        cout << robot->getName() << " received data " << data << endl;
+        // cout << robot->getName() << " received data " << data << endl;
 
         cout << getMessageType(data) << endl;
         if (!isChannelTurned && getMessageType(data) == "ACCEPT")
@@ -420,7 +498,7 @@ bool Communication::establishConnection()
 
             string partnerId = getPartnerId(data);
             string receiverId = getReceiverId(data);
-            cout << robot->getName() << " received ACCEPT from  " << partnerId << " and for " << receiverId << endl;
+            // cout << robot->getName() << " received ACCEPT from  " << partnerId << " and for " << receiverId << endl;
 
             if (receiverId == this->robotId)
             {
@@ -432,12 +510,12 @@ bool Communication::establishConnection()
 
                     emitter->setChannel(commChannel);
                     receiver->setChannel(commChannel);
-                    cout << robot->getName() << " " << emitter->getChannel() << " " << receiver->getChannel() << " " << receiver->getQueueLength() << endl;
+                    // cout << robot->getName() << " " << emitter->getChannel() << " " << receiver->getChannel() << " " << receiver->getQueueLength() << endl;
                     isChannelTurned = true;
                 }
                 else
                 {
-                    cout << robot->getName() << " sent reject message 2 " << partnerId << " this->partnerId " << this->partnerId << endl;
+                    // cout << robot->getName() << " sent reject message 2 " << partnerId << " this->partnerId " << this->partnerId << endl;
                     sendMessage("REJECT_" + robotId);
                 }
             }
@@ -472,8 +550,8 @@ bool Communication::establishConnectionV2()
     // clear queue
     // clearQueue();
 
-    cout << robot->getName() << " establishing connection" << endl;
-    cout << robot->getName() << " partnerId " << partnerId << endl;
+    // cout << robot->getName() << " establishing connection" << endl;
+    // cout << robot->getName() << " partnerId " << partnerId << endl;
 
     commStartTime = robot->getTime();
     isCommunicating = true;
@@ -601,7 +679,7 @@ bool Communication::establishConnectionV2()
 bool Communication::establishConnectionV3()
 {
     bool isMajor = stoi(robotId) > stoi(partnerId);
-    cout<<robot->getName()<<" is major: "<<isMajor<<endl;
+    // cout << robot->getName() << " is major: " << isMajor << endl;
     int timestep = getRobotTimestep(robot);
 
     commStartTime = robot->getTime();
@@ -625,7 +703,7 @@ bool Communication::establishConnectionV3()
             if (robot->getTime() - commStartTime > ESTIMATED_COMM_TIME)
             {
                 cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
-                cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
+                // cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
                 handleReject();
                 return false;
             }
@@ -663,8 +741,13 @@ bool Communication::establishConnectionV3()
                 emitter->setChannel(commChannel);
                 receiver->setChannel(commChannel);
                 clearQueue();
-                cout<<robot->getName()<<" is in room"<<endl;
+                // cout << robot->getName() << " is in room" << endl;
                 break;
+            }
+            else if (getMessageType(data) == "ACCEPT" && isMessageForMe(data))
+            {
+                const string senderId = getPartnerId(data);
+                sendMessage("REJECT_" + robotId + "_" + senderId);
             }
             else if (getMessageType(data) == "REJECT" && isMessageForMe(data))
             {
@@ -683,7 +766,7 @@ bool Communication::establishConnectionV3()
             if (robot->getTime() - commStartTime > ESTIMATED_COMM_TIME)
             {
                 cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
-                cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
+                // cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
                 handleReject();
                 return false;
             }
@@ -713,7 +796,7 @@ bool Communication::establishConnectionV3()
 
             if (getMessageType(data) == "ACK" && isMessageForMe(data))
             {
-                cout<<robot->getName()<<" Now, I can exchange the path"<<endl;
+                // cout << robot->getName() << " Now, I can exchange the path" << endl;
                 return true;
             }
         }
@@ -728,7 +811,7 @@ bool Communication::establishConnectionV3()
             if (robot->getTime() - commStartTime > ESTIMATED_COMM_TIME)
             {
                 cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
-                cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
+                // cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
                 handleReject();
                 return false;
             }
@@ -752,7 +835,7 @@ bool Communication::establishConnectionV3()
                 emitter->setChannel(commChannel);
                 receiver->setChannel(commChannel);
                 clearQueue();
-                cout<<robot->getName()<<" is in room"<<endl;
+                // cout << robot->getName() << " is in room" << endl;
 
                 break;
             }
@@ -765,7 +848,7 @@ bool Communication::establishConnectionV3()
             if (robot->getTime() - commStartTime > ESTIMATED_COMM_TIME)
             {
                 cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
-                cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
+                // cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
                 handleReject();
                 return false;
             }
@@ -779,7 +862,7 @@ bool Communication::establishConnectionV3()
             if (getMessageType(data) == "ACK" && isMessageForMe(data))
             {
                 sendMessage("ACK_" + robotId + "_" + partnerId);
-                cout<<robot->getName()<<" Now, I can exchange the path"<<endl;
+                // cout << robot->getName() << " Now, I can exchange the path" << endl;
 
                 return true;
             }
