@@ -165,12 +165,12 @@ void Communication::disableReceiver()
 //     // cout << robot->getName() << " Path sending done" << endl;
 // }
 
-void Communication::broadcastPath(vector<vector<double>> &path)
+bool Communication::broadcastPath(vector<vector<double>> &path)
 {
     // if robot's mode is explore, then do not broadcast the path
     if (*robotMode == "explore")
     {
-        return;
+        return false;
     }
 
     cout << robot->getName() << " broadcasting path " <<path[path.size()-1][0]<<" "<<path[path.size()-1][1]<< endl;
@@ -187,15 +187,24 @@ void Communication::broadcastPath(vector<vector<double>> &path)
 
     cout << robot->getName() << " broadcasting path done" << endl;
 
+    return true;
     // cout << robot->getName() << " Path sending done" << endl;
 }
 
 bool Communication::shouldCommunicate(string id, string mode)
 {
+    // return false;
+    
+    if(robot->getTime() <= 900) return false;
+      
     if (mode == "explore" && *robotMode == "explore")
     {
         return false;
     }
+
+    if(mode == "explore")   return true;
+    if(*robotMode == "explore") return true;
+    return false;
 
     if (priority.count(id))
         return ((robot->getTime() - priority[id]) >= COMM_WAITING_TIME);
@@ -316,25 +325,25 @@ bool Communication::receivePath(vector<vector<double>> &partnerPath)
 
     while (robot->step(timestep) != -1)
     {
-        cout << "innn" << endl;
+        // cout << "innn" << endl;
         if (!receiver->getQueueLength())
         {
 
-            cout << "innn 1" << endl;
+            // cout << "innn 1" << endl;
 
             continue;
         }
 
         if (robot->getTime() - startTime >= ESTIMATED_COMM_TIME)
         {
-            cout << "innn 2" << endl;
+            // cout << "innn 2" << endl;
 
             handleReject();
             return false;
         }
         // get data
         string data = getNextMessage();
-        cout << robot->getName() << " received data: " << data << endl;
+        // cout << robot->getName() << " received data: " << data << endl;
 
         if (getMessageType(data) == "PATH")
         {
@@ -459,8 +468,8 @@ bool Communication::establishConnection()
 
         if (robot->getTime() - commStartTime > ESTIMATED_COMM_TIME)
         {
-            cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
-            cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
+            // cout << robot->getName() << " says, I have done enough waiting, I am not going to wait more" << endl;
+            // cout << robot->getName() << " xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << ++ccc << endl;
             handleReject();
             return false;
         }
@@ -870,6 +879,9 @@ bool Communication::establishConnectionV3()
     }
 }
 
+string Communication::getPartnerId(){
+    return partnerId;
+}
 bool Communication::isMessageForMe(const string &message)
 {
     const string receiverId = getReceiverId(message);
@@ -878,6 +890,9 @@ bool Communication::isMessageForMe(const string &message)
     return senderId == this->partnerId && receiverId == this->robotId;
 }
 
+string Communication::getPartnerMode(){
+    return partnerMode;
+}
 int Communication::getCommunicationChannel(const string &robotId, const string &partnerId)
 {
 
@@ -889,7 +904,7 @@ int Communication::getCommunicationChannel(const string &robotId, const string &
 
 void Communication::handleReject()
 {
-    cout << robot->getName() << " handling rejection" << endl;
+    // cout << robot->getName() << " handling rejection" << endl;
 
     isCommunicating = false;
     partnerId = "";
@@ -907,7 +922,7 @@ void Communication::handleReject()
 
 void Communication::clearQueue()
 {
-    cout << robot->getName() << " clearing the queue =s=s==s=s=s=s=s=s=s=s=s=s=s=s=-s=s=s=s=s-=sdf-=sd-f=ds-f=sd-f=dsf-=sd-f=ds-f=sdf-=" << endl;
+    // cout << robot->getName() << " clearing the queue =s=s==s=s=s=s=s=s=s=s=s=s=s=s=-s=s=s=s=s-=sdf-=sd-f=ds-f=sd-f=dsf-=sd-f=ds-f=sdf-=" << endl;
     while (receiver->getQueueLength())
         receiver->nextPacket();
 }

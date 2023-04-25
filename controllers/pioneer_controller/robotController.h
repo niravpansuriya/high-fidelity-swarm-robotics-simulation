@@ -11,6 +11,7 @@
 #include "sensors.h"
 #include "communication.h"
 #include "TrackerApp.h"
+#include "FileManager.h"
 using namespace webots;
 using namespace std;
 
@@ -22,6 +23,7 @@ private:
     PositionController *positionController;
     SensorsController *sensorController;
     Communication *communication;
+    FileManager *fileManager;
     string robotId;
     string mode; // explore or transport
 

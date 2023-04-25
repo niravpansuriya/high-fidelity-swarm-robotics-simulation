@@ -12,4 +12,4 @@ build/release/robotController.o: robotController.cpp robotController.h \
  robotsUtils.h cartesian.h sensors.h communication.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Emitter.hpp \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Receiver.hpp \
- TrackerApp.h Trace.h
+ TrackerApp.h Trace.h FileManager.h

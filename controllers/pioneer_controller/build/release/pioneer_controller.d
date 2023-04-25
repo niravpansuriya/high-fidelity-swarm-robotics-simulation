@@ -20,4 +20,4 @@ build/release/pioneer_controller.o: pioneer_controller.cpp \
  cartesian.h robotController.h communication.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Emitter.hpp \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Receiver.hpp \
- TrackerApp.h Trace.h
+ TrackerApp.h Trace.h FileManager.h

@@ -10,6 +10,7 @@
 #include "robotController.h"
 #include "communication.h"
 #include "defs.h"
+#include "FileManager.h"
 #include <webots/Display.hpp>
 #include <webots/Emitter.hpp>
 #include <webots/Receiver.hpp>
@@ -26,6 +27,8 @@ int main(int argc, char **argv)
   Robot *robot = new Robot();
 
   string robotId = getRobotId((robot->getName()));
+  // FileManager *fileManager = new FileManager("./data", robotId + ".csv");
+
   RobotController *robotController = new RobotController(robot, robotId);
 
   SensorsController *sensorsController = new SensorsController(robot);
@@ -192,27 +195,27 @@ int main(int argc, char **argv)
     // if (robot->getName() == "robot_1")
     // {
 
-      if (robotController->getMode() == "explore")
+    if (robotController->getMode() == "explore")
+    {
+      // display->setColor(0xFF0000);
+      robotController->exploreEnvironment();
+      robotController->updateMode("transport");
+      f = false;
+    }
+    else
+    {
+      // display->setColor(0x00FF00);
+
+      if (temp % 2 == 0)
       {
-        // display->setColor(0xFF0000);
-        robotController->exploreEnvironment();
-        robotController->updateMode("transport");
-        f = false;
+        robotController->followPath(false);
       }
       else
       {
-        // display->setColor(0x00FF00);
-
-        if (temp % 2 == 0)
-        {
-          robotController->followPath(false);
-        }
-        else
-        {
-          robotController->followPath(true);
-        }
-        temp++;
+        robotController->followPath(true);
       }
+      temp++;
+    }
     // }
 
     // }
@@ -489,7 +492,6 @@ int main(int argc, char **argv)
   };
 
   // Enter here exit cleanup code.
-
   delete robot;
   return 0;
 }

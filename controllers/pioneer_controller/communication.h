@@ -38,14 +38,16 @@ public:
     void enableReceiver();
     void disableReceiver();
 
-    void broadcastPath(vector<vector<double>> &path);
+    bool broadcastPath(vector<vector<double>> &path);
     int interceptReceiver(string robotId, string robotMode);
     bool shouldCommunicate(string id, string mode);
     bool isPartnerNear();
 
     string getMessageType(const string &message);
     string getPartnerId(const string &message);
+    string getPartnerId();
     string getPartnerMode(const string &message);
+    string getPartnerMode();
     void sendMessage(string message);
     void handleReject();
     string getNextMessage();

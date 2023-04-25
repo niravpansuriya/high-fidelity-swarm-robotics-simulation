@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <fstream>
 #include <webots/Display.hpp>
 
 
@@ -39,7 +40,7 @@ using namespace std;
 #define TOO_CLOSE_DISTANCE 0.5f
 
 #define DISTANCE_COOR_STORING 0.3
-#define DISTANCE_NEW_DIRECTION 0.5
+#define DISTANCE_NEW_DIRECTION 0.3 
 
 #define PATH_RADIUS_THRESHOLD 0.25 // 1 -> working great
 
@@ -47,10 +48,12 @@ using namespace std;
 #define MAX_STEP_TIME 100
 #define ROBOT_SPEED 6
 
-#define PATH_SMOOTHING_RADIUS 6 // 4 -> working great
+#define PATH_SMOOTHING_RADIUS 4 // 4 -> working great
 #define MIN_PATH_SMOOTHING_RADIUS 0
-#define DESTINATION_X -26.8562
-#define DESTINATION_Y -10.4944
+#define DESTINATION_X 4.96412
+#define DESTINATION_Y -12.5933
+// #define DESTINATION_X -26.5271
+// #define DESTINATION_Y -10.8252
 
 #define COMM_WAITING_TIME 600
 #define ESTIMATED_COMM_TIME 10
