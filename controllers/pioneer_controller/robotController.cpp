@@ -46,6 +46,7 @@ void RobotController::exploreEnvironment()
     vector<double> lastCords;
     double lastCheck = -1;
     vector<double> lastCoorTurned;
+    int left = 0, right = 0;
     while (robot->step(timeStep) != -1)
     {
         // if (c >= l)
@@ -85,6 +86,7 @@ void RobotController::exploreEnvironment()
             // cout<<"lastCords "<<lastCords[0]<<" "<<lastCords[1]<<endl;
             if (cartesianIsCoordinateEqual(currLocation, lastCords))
             {
+
                 // go back
                 int count = 0;
                 motorController->setSpeed(-2, -2);
@@ -112,6 +114,8 @@ void RobotController::exploreEnvironment()
 
         if (oppoCount-- >= 0)
         {
+            // cout << "turn left" << endl;
+
             // leftF = -0.1;
             // rightF = 0.1;
             motorController->setSpeed(-1, 1, 1);
@@ -120,6 +124,8 @@ void RobotController::exploreEnvironment()
 
         if (count-- <= 0)
         {
+            // cout << "go straight" << endl;
+
             leftF = 1;
             rightF = 1;
         }
@@ -128,17 +134,34 @@ void RobotController::exploreEnvironment()
             addLocationToVisitedPath(currLocation);
         else if (lastCoorTurned.size() == 0 || getDistance(lastCoorTurned, currLocation) >= DISTANCE_NEW_DIRECTION)
         {
+            // if(lastCoorTurned.size())
+            //     cout << "5 " <<getDistance(lastCoorTurned, currLocation)<< endl;
             lastCoorTurned = currLocation;
-            count = uniform(-16, 16);
-            if (count < 0)
+            while (true)
             {
-                leftF = 0.8;
-                rightF = 1;
-            }
-            else
-            {
-                leftF = 1;
-                rightF = 0.8;
+                count = uniform(-2, 2);
+                if (count == 0)
+                {
+                    continue;
+                }
+                else if (count < 0)
+                {
+                    // cout << "randomly left selected" << endl;
+                    // cout << ++left << " " << right << endl;
+                    leftF = 0.8;
+                    rightF = 1;
+                    break;
+                }
+                else
+                {
+                    // cout << "randomly right selected" << endl;
+
+                    // cout << left << " " << ++right << endl;
+
+                    leftF = 1;
+                    rightF = 0.8;
+                    break;
+                }
             }
         }
         else if (getDistance(path[path.size() - 1], currLocation) >= DISTANCE_COOR_STORING)
@@ -156,13 +179,17 @@ void RobotController::exploreEnvironment()
                                    ", " +                                   // broadcastedPath
                                    ", " +                                   // receivedPath
                                    ", " +                                   // before path length
-                                   ", "                                     // after path length
+                                   ", " +                                   // after path length
+                                   ", " +                                   // sent data size
+                                   ", "                                     // received data size
+
             );
             addLocationToVisitedPath(currLocation);
         }
 
         if (sensorController->getDistanceAtFront() < 1 || sensorController->getDistanceAtFrontLeft() < 1 || sensorController->getDistanceAtFrontRight() < 1)
         {
+
             // cout<<"sensorController->getDistanceAtFront() "<<sensorController->getDistanceAtFront()<<endl;
             // cout<<"sensorController->getDistanceAtFrontLeft() "<<sensorController->getDistanceAtFrontLeft()<<endl;
             // cout<<"sensorController->getDistanceAtFrontRight() "<<sensorController->getDistanceAtFrontRight()<<endl;
@@ -181,6 +208,7 @@ void RobotController::exploreEnvironment()
              sensorController->isSomethingInLeft() &&
              sensorController->isSomethingInRight()))
         {
+
             count = 0;
             oppoCount = 80;
         }
@@ -189,28 +217,52 @@ void RobotController::exploreEnvironment()
             // get left distance and right distance
             if (last == "left")
             {
+                // cout << "turn right as last reading was left, something in front" << endl;
+
                 motorController->setSpeed(1, -1, 20);
             }
             else if (last == "right")
+            {
+                // cout << "turn left as last was right, something in front" << endl;
+
                 motorController->setSpeed(-1, 1, 20);
+            }
             else
             {
                 // take random turn
-                double r = uniform(-1, 1);
-                if (r < 0)
+                while (true)
                 {
-                    motorController->setSpeed(1, -1, 20);
-                    last = "left";
-                }
-                else
-                {
-                    motorController->setSpeed(-1, 1, 20);
-                    last = "right";
+                    double r = uniform(-1, 1);
+                    if (r == 0)
+                    {
+                        continue;
+                    }
+                    if (r < 0)
+                    {
+                        // cout << "turn left randomly, last set right" << endl;
+                        // cout << ++left << " " << right << endl;
+
+                        motorController->setSpeed(-1, 1, 20);
+                        last = "right";
+                        break;
+                    }
+                    else
+                    {
+                        // cout << "turn right randomly, last set left" << endl;
+
+                        // cout << left << " " << ++right << endl;
+
+                        motorController->setSpeed(1, -1, 20);
+                        last = "left";
+                        break;
+                    }
                 }
             }
         }
         else if (sensorController->isSomethingInFrontLeft())
         {
+            // cout << "something in front left, turn right" << endl;
+
             // cout<<"left"<<endl;
             last = "left";
 
@@ -218,6 +270,8 @@ void RobotController::exploreEnvironment()
         }
         else if (sensorController->isSomethingInFrontRight())
         {
+            // cout << "something in front right, turn left" << endl;
+
             // cout<<"right"<<endl;
 
             last = "right";
@@ -226,6 +280,8 @@ void RobotController::exploreEnvironment()
         }
         else if (sensorController->isSomethingInLeft())
         {
+            // cout << "something in left, turn right" << endl;
+
             // cout<<"sleft"<<endl;
 
             last = "left";
@@ -234,6 +290,8 @@ void RobotController::exploreEnvironment()
         }
         else if (sensorController->isSomethingInRight())
         {
+            // cout << "something in right, turn left" << endl;
+
             // cout<<"sright"<<endl;
             last = "right";
 
@@ -261,12 +319,16 @@ void RobotController::exploreEnvironment()
                                        ", " +                                   // broadcastedPath
                                        ", " +                                   // receivedPath
                                        to_string(getPathLength(path)) + ", " +  // before path length
-                                       ", "                                     // after path length
+                                       ", " +                                   // after path length
+                                       ", " +                                   // sent data size
+                                       ", "                                     // received data size
                 );
                 return;
             }
             else
             {
+                // cout << "all clear, go straight, last cleared" << endl;
+
                 last = "";
                 motorController->setSpeed(speed * leftF, speed * rightF, 1);
             }
@@ -374,14 +436,16 @@ void RobotController::followPath(bool forward)
                                to_string(currLocation[1]) + ", " +     // long
                                "T" + ", " +                            // mode
                                "F, " +                                 // isComm
-                               "F, " +                                  // direction
+                               "F, " +                                 // direction
                                ", " +                                  // reached
                                ", " +                                  // partnerId
                                ", " +                                  // partnerMode
                                ", " +                                  // broadcastedPath
                                ", " +                                  // receivedPath
                                to_string(getPathLength(path)) + ", " + // before path length
-                               ", "                                    // after path length
+                               ", " +                                  // after path length
+                               ", " +                                  // sent data size
+                               ", "                                    // received data size
         );
         // get nearest Index
         // for (llu i = currentPathIndex; i < path.size(); i++)
@@ -401,14 +465,16 @@ void RobotController::followPath(bool forward)
                                    to_string(currLocation[1]) + ", " +  // long
                                    "T" + ", " +                         // mode
                                    "F, " +                              // isComm
-                                   "F, " +                               // direction
+                                   "F, " +                              // direction
                                    ", " +                               // reached
                                    ", " +                               // partnerId
                                    ", " +                               // partnerMode
                                    ", " +                               // broadcastedPath
                                    ", " +                               // receivedPath
                                    ", " +                               // before path length
-                                   ", "                                 // after path length
+                                   ", " +                               // after path length
+                                   ", " +                               // sent data size
+                                   ", "                                 // received data size
             );
 
             moveToDestination(destination);
@@ -458,7 +524,7 @@ void RobotController::followPath(bool forward)
                                    to_string(currLocation[1]) + ", " +  // long
                                    "T" + ", " +                         // mode
                                    "F, " +                              // isComm
-                                   "R, " +                               // direction
+                                   "R, " +                              // direction
                                    ", " +                               // reached
                                    ", " +                               // partnerId
                                    ", " +                               // partnerMode
@@ -809,15 +875,19 @@ int RobotController::middleware()
             string pMode = communication->getPartnerMode();
             bool broadcastedPath = false;
             bool isPathReceived = false;
+            int sentData = 0, receivedData = 0;
             double bL, aL;
             if (mode != "explore")
                 broadcastedPath = communication->broadcastPath(path);
+            if (broadcastedPath)
+                sentData = path.size();
 
             // cout << "1000" << endl;
             vector<vector<double>> receivedPath;
             if (communication->receivePath(receivedPath))
             {
                 isPathReceived = true;
+                receivedData = receivedPath.size();
                 // cout << robot->getName() << " ==================================================================== path received: ";
                 // for (vector<double> path : receivedPath)
                 // {
@@ -847,7 +917,9 @@ int RobotController::middleware()
                                    (broadcastedPath ? "T" : "F") + ", " +    // broadcastedPath
                                    (isPathReceived ? "T" : "F") + ", " +     // receivedPath
                                    to_string(bL) + ", " +                    // before path length
-                                   to_string(aL) + ", "                      // after path length
+                                   to_string(aL) + ", " +                    // after path length
+                                   to_string(sentData) + ", " +              // sent data size
+                                   to_string(receivedData) + ", "            // received data size
             );
         }
         else

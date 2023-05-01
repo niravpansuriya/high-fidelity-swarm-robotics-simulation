@@ -202,9 +202,9 @@ bool Communication::shouldCommunicate(string id, string mode)
         return false;
     }
 
-    if(mode == "explore")   return true;
-    if(*robotMode == "explore") return true;
-    return false;
+    // if(mode == "explore")   return true;
+    // if(*robotMode == "explore") return true;
+    // return false;
 
     if (priority.count(id))
         return ((robot->getTime() - priority[id]) >= COMM_WAITING_TIME);
